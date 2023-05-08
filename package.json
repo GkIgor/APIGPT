@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "piii": "^4.0.2"
+    "piii": "^4.0.2",
+    "qrcode-terminal": "^0.12.0"
   }
 }
