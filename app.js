@@ -1,13 +1,12 @@
 const { Client } = require("whatsapp-web.js");
-const qrcode = require("qrcode-terminal");
 const client = new Client();
+const qrcode = require("qrcode-terminal");
+const Piii = require("piii");
 //OpenAI requires
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const Piii = require("piii");
 
 class Message {
   constructor(texto) {
@@ -23,14 +22,31 @@ class Message {
   }
 }
 
-async function gpt(prompt) {
+function exemplo() {
+  let exemplos = [
+    "$bot Crie uma frase engraçada para compartilhar no grupo.",
+    "$bot Escreva um texto que possa ser usado como legenda em uma foto.",
+    "$bot Crie uma frase inspiradora para compartilhar no grupo.",
+    "$bot Escreva uma mensagem de bom dia para alegrar o grupo.",
+    "$bot Crie uma mensagem de parabéns para um membro do grupo.",
+    "$bot Escreva uma mensagem de agradecimento para o organizador do último evento.",
+    "$bot Crie uma mensagem de despedida para um membro que está saindo do grupo.",
+    "$bot Escreva uma mensagem motivacional para incentivar os membros do grupo.",
+    "$bot Crie uma mensagem divertida para compartilhar com o grupo no fim de semana.",
+    "$bot Escreva uma mensagem de boas-vindas para um novo membro do grupo.",
+  ];
+  let numeroAleatorio = Math.floor(Math.random() * exemplo.length);
+  return exemplo[numeroAleatorio];
+}
+
+async function gpt(prompt, model = 'gpt-3.5-turbo', role = 'assistant', temperature = 0.6, max_tokens = 150) {
   const openai = new OpenAIApi(configuration);
   const completion = await openai.createCompletion({
-    model: "gpt-3.5-turbo",
-    role: "assistant",
+    model,
+    role: role,
     prompt: prompt,
-    temperature: 0.6,
-    max_tokens: 100,
+    temperature,
+    max_tokens,
   });
   let response = completion.data.choices[0].message;
   return response;
@@ -41,20 +57,30 @@ client.on("message", async (message) => {
 
   if (mensagem.startsWith("$bot")) {
     if (mensagem.isValid()) {
-
       let comando = mensagem.texto.split(" ")[1];
 
       switch (comando) {
-        // Responder com o link da documentação
-        case '/doc':
+
+        case "/doc":
           await message.reply(`\n Consulte a documentação completa em https://api-gpt.vercel.app/`);
+        break;
+
+        case "/exemplo":
+          await message.reply(`\n Exemplo de uso:`);
+          await message.sendMessage(exemplo());
+        break;
+
+        case "--config":
+          
+          break;
       }
 
       let response = await gpt(mensagem.texto);
       await message.reply(`GPT:\n${response}`);
-
     } else {
-      message.reply(`Desculpe, sua mensagem está fora do escopo de resposta.\n Verifique com os administradores do sistema ou consulte a documentação em https://api-gpt.vercel.app/. @5562986268745`);
+      message.reply(
+        `Desculpe, sua mensagem está fora do escopo de resposta.\n Verifique com os administradores do sistema ou consulte a documentação em https://api-gpt.vercel.app/. @5562986268745`
+      );
     }
   }
 });
