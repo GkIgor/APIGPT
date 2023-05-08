@@ -1,4 +1,11 @@
-const { create, Whatsapp } = require('@open-wa/wa-automate');
+const { Client } = require('whatsapp-web.js');
+const client = new Client();
+//OpenAI requires
+const { Configuration, OpenAIApi } = require("openai");
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 const Piii = require('piii');
 
 class Message {
@@ -13,46 +20,22 @@ class Message {
   }
 }
 
-create().then((client) => {
-   client.onMessage(async (message) => {
-    if (message.body.startsWith('$bot')) {
-      const msg = new Message(message.body.substring(4));
-      if (msg.isValid()) {
-        console.log('Nova mensagem recebida:', message.body);
-        // Chamar a função para gerar a resposta usando o GPT-3 ou outro modelo
 
-        const { Configuration, OpenAIApi } = require("openai");
-
-        const configuration = new Configuration({
-          apiKey: process.env.OPENAI_API_KEY,
-        });
-        const openai = new OpenAIApi(configuration);
-
-        const completion = await openai.createChatCompletion({
-          model: "gpt-3.5-turbo",
-          messages: [{role: "user", content: message.body}],
-        });
-        console.log(completion.data.choices[0].message);
-
-      } else {
-        console.log('Mensagem inválida recebida:', message.body);
-      }
-    }
-  });
-}).catch((err) => { console.error(err) });
-
-
-/*
-const { Configuration, OpenAIApi } = require("openai");
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
-const completion = await openai.createChatCompletion({
+  const openai = new OpenAIApi(configuration);
+  const response = await openai.createCompletion({
   model: "gpt-3.5-turbo",
-  messages: [{role: "user", content: new Message(message)}],
+  prompt: "Say this is a test",
+  temperature: 0.6,
+  max_tokens: 20,
+  });
+
+
+client.on('qr', (qr) => {
+    console.log('QR RECEIVED', qr);
 });
-console.log(completion.data.choices[0].message);
-*/
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+});
+
+client.initialize();
