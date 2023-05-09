@@ -55,7 +55,7 @@ async function gpt(prompt, model = 'gpt-3.5-turbo', role = 'assistant', temperat
 client.on("message", async (message) => {
   let mensagem = new Message(message.body);
 
-  if (mensagem.startsWith("$bot")) {
+  if (mensagem.slice(0, 4)) {
     if (mensagem.isValid()) {
       let comando = mensagem.texto.split(" ")[1];
 
