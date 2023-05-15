@@ -37,32 +37,50 @@ client.initialize()
 
 
 client.on('message_create', async (msg) => {
-  const { body, _data: { id: { _serialized } } } = msg;
-  const chat = await msg.getChat();
-  console.log(chat)
-  console.log()
+  try {
+    const { body, id: {remote} } = msg;
+    const chat = await msg.getChat();
+    const valid = body.startsWith('$bot') && grupos.includes(remote) && chat.isGroup;
+
+    if (valid) {
+     //bot vai aqui
+
+    } else {
+      console.log(`Não disponível para mensagens privadas. Para mais informações, contate o administrador do bot @${5562986268745} `)
+    }
+
+  } catch (err) {
+    await msg.reply(`Um erro inesperado aconteceu, contate o administrador do bot @${5562986268745}`)
+    console.error(err)
+
+
+
+
+
+    console.log('--------------------------------------------------')
+    //console.log(body)
+  }
+
   //console.log(body)
-  //console.log(_serialized)
+  //
   // const { groupMetadata: { id: { _serialized } } } = await msg.getChat();
   // console.log(_serialized);
-  
-  
-  
-  console.log('--------------------------------------------------------')
-  
+
+
+
+
   //console.log(msg)
-  //const chatId = chat.GroupChat.groupMetadata.id._serialized || chat.PrivateChat.id._serialized;
-  // const valid = body.toString().startsWith('$bot') && grupos.includes(chatId);
+  // 
 
   //console.log('--------------------------------------------------------')
   //console.log(valid)
   // console.log(grupos.includes(chatId))
   //console.log(msg.toString().trim().startsWith('$bot'))
 
- /* if (valid) {
-    
-    msg.reply(`Funcionando! \n\n ${chatId}`)
-  } */
+  /* if (valid) {
+     
+     msg.reply(`Funcionando! \n\n ${chatId}`)
+   } */
 
 
   // await client.sendMessage(chatID, `Funcionando! \n\n Chat ID:, ${chatID} \n\n Chat NAME:${msg.getChat().name}`);
